@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.22823.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A6A7B553-5359-4FB9-B19C-8A23004F49DB}"
 	ProjectSection(SolutionItems) = preProject
@@ -70,6 +70,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeItEasy.Win81.Tests", "F
 		{E0779E7F-8E25-4367-A7C1-57FCC91AF2FD} = {E0779E7F-8E25-4367-A7C1-57FCC91AF2FD}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeItEasy.Analyzers", "FakeItEasy.Analyzers\FakeItEasy.Analyzers\FakeItEasy.Analyzers.csproj", "{13E2F3A5-9807-4FF6-9D35-AFE7F1612B74}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeItEasy.Analyzers.Test", "FakeItEasy.Analyzers\FakeItEasy.Analyzers.Test\FakeItEasy.Analyzers.Test.csproj", "{F8F32F69-CB3B-4107-BF38-FFD65BF246C7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeItEasy.Analyzers.Vsix", "FakeItEasy.Analyzers\FakeItEasy.Analyzers.Vsix\FakeItEasy.Analyzers.Vsix.csproj", "{775455B3-29A7-4A7B-B173-D5B9437454E6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzers", "Analyzers", "{B673C40B-30A2-4E4F-850F-AA7CCAF38D25}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -132,6 +140,18 @@ Global
 		{A84169B8-3CAC-415B-A367-A167836B034C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A84169B8-3CAC-415B-A367-A167836B034C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A84169B8-3CAC-415B-A367-A167836B034C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13E2F3A5-9807-4FF6-9D35-AFE7F1612B74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13E2F3A5-9807-4FF6-9D35-AFE7F1612B74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13E2F3A5-9807-4FF6-9D35-AFE7F1612B74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13E2F3A5-9807-4FF6-9D35-AFE7F1612B74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8F32F69-CB3B-4107-BF38-FFD65BF246C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8F32F69-CB3B-4107-BF38-FFD65BF246C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8F32F69-CB3B-4107-BF38-FFD65BF246C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8F32F69-CB3B-4107-BF38-FFD65BF246C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{775455B3-29A7-4A7B-B173-D5B9437454E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{775455B3-29A7-4A7B-B173-D5B9437454E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{775455B3-29A7-4A7B-B173-D5B9437454E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{775455B3-29A7-4A7B-B173-D5B9437454E6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -151,6 +171,9 @@ Global
 		{5D41D463-D53B-4ADC-90AD-44AA03D6340D} = {52D18A62-B744-48F6-A4B5-1382F83FA437}
 		{575A3C3B-17BA-4A8A-9F53-05320913D0A6} = {52D18A62-B744-48F6-A4B5-1382F83FA437}
 		{A84169B8-3CAC-415B-A367-A167836B034C} = {DC5EAE30-96E3-4D38-B3C5-33E587C9FB76}
+		{13E2F3A5-9807-4FF6-9D35-AFE7F1612B74} = {B673C40B-30A2-4E4F-850F-AA7CCAF38D25}
+		{F8F32F69-CB3B-4107-BF38-FFD65BF246C7} = {B673C40B-30A2-4E4F-850F-AA7CCAF38D25}
+		{775455B3-29A7-4A7B-B173-D5B9437454E6} = {B673C40B-30A2-4E4F-850F-AA7CCAF38D25}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		version = 0.1
