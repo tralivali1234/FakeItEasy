@@ -1,9 +1,16 @@
+.nuget
+.vs
 [Oo]bj
 [Bb]in
+[Oo]bjcs
+[Oo]bjvb
 artifacts
+packages
+src/VersionInfo.cs
+src/FakeItEasy.nuspec
 
-*.csproj.user
-*.vbproj.user
+*.*proj.user
+*.lock.json
 *.ncb
 *.suo
 *.orig
@@ -12,12 +19,5 @@ artifacts
 *[Rr][Ee][Ss][Hh][Aa][Rr][Pp][Ee][Rr]*
 *.[Dd]ot[Ss]ettings.*
 Thumbs.db
-
-/Source/packages/*
-!/Source/packages/NuGet.CommandLine.*
-/Source/packages/NuGet.CommandLine.*/*
-/Source/packages/NuGet.CommandLine.*/*.*
-!/Source/packages/NuGet.CommandLine.*/tools
-/Source/packages/NuGet.CommandLine.*/tools/*
-/Source/packages/NuGet.CommandLine.*/tools/*.*
-!/Source/packages/NuGet.CommandLine.*/tools/NuGet.exe
+*.received.txt
+*.nuget.targets
