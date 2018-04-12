@@ -23,16 +23,16 @@ This would help FakeItEasy display this error message:
 <pre>
 Assertion failed for the following call:
   SampleTests.ILibrary.Checkout(<Ignored>)
-Expected to find it never but found it #1 times among the calls:
+Expected to find it never but found it once among the calls:
   1: SampleTests.ILibrary.Checkout(<b>book: 'The Ocean at the End of the Lane', published on 2013-06-18</b>)
 </pre>
 which could make tracking down any failures a little easier.
 
-Compare to the original behaviour:
+Compare to the original behavior:
 <pre>
 Assertion failed for the following call:
   SampleTests.ILibrary.Checkout(<Ignored>)
-Expected to find it never but found it #1 times among the calls:
+Expected to find it never but found it once among the calls:
   1: SampleTests.ILibrary.Checkout(<b>book: SampleTests.Book</b>)
 </pre>
 
@@ -72,18 +72,18 @@ types, abstract types, and interfaces. Formatters defined for base
 types and interfaces will be used when formatting values whose types
 extend or implement the formatter's type.
 
-## FakeItEasy's default formatter behaviour
+## FakeItEasy's default formatter behavior
 
 Unless custom formatters are provided, FakeItEasy formats argument
 values like so:
 
-- the `null` value is formatted as `<null>`,
+- the `null` value is formatted as `NULL`,
 - the empty `string` is formatted as `string.Empty`,
 - other `string` values are formatted as `"the string value"`, including the quotation marks, and
 - any other value is formatted as its `ToString()` result
 
-There is no way to change FakeItEasy's behaviour when formatting
-`null`, but the other behaviour can be overridden by user-defined
+There is no way to change FakeItEasy's behavior when formatting
+`null`, but the other behavior can be overridden by user-defined
 formatters.
 
 ## Resolving formatter collisions

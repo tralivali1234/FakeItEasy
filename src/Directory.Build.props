@@ -1,5 +1,7 @@
 <Project>
 
+  <Import Project="../Directory.Build.props" />
+
   <PropertyGroup Label="Common package properties">
     <Copyright>Copyright (c) FakeItEasy contributors. (fakeiteasyfx@gmail.com)</Copyright>
     <PackageProjectUrl>https://fakeiteasy.github.io/</PackageProjectUrl>
@@ -8,13 +10,5 @@
     <PackageReleaseNotes>https://github.com/FakeItEasy/FakeItEasy/releases</PackageReleaseNotes>
     <NoPackageAnalysis>true</NoPackageAnalysis>
   </PropertyGroup>
-
-  <ItemGroup>
-    <!-- Include symbols in the package -->
-    <Content Include="$(OutputPath)/**/$(AssemblyName).pdb">
-      <Pack>true</Pack>
-      <PackagePath>$(BuildOutputTargetFolder)/%(RecursiveDir)$(AssemblyName).pdb</PackagePath>
-    </Content>
-  </ItemGroup>
 
 </Project>

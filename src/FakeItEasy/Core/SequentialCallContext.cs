@@ -3,18 +3,21 @@ namespace FakeItEasy.Core
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text;
 
     internal class SequentialCallContext
     {
         private readonly CallWriter callWriter;
+        private readonly StringBuilderOutputWriter.Factory outputWriterFactory;
         private readonly HashSet<FakeManager> fakeManagers;
         private readonly List<AssertedCall> assertedCalls;
         private int currentSequenceNumber;
 
-        public SequentialCallContext(CallWriter callWriter)
+        public SequentialCallContext(CallWriter callWriter, StringBuilderOutputWriter.Factory outputWriterFactory)
         {
             Guard.AgainstNull(callWriter, nameof(callWriter));
             this.callWriter = callWriter;
+            this.outputWriterFactory = outputWriterFactory;
             this.fakeManagers = new HashSet<FakeManager>();
             this.assertedCalls = new List<AssertedCall>();
             this.currentSequenceNumber = -1;
@@ -24,22 +27,22 @@ namespace FakeItEasy.Core
             FakeManager fakeManager,
             Func<IFakeObjectCall, bool> callPredicate,
             Action<IOutputWriter> callDescriber,
-            Repeated repeatConstraint)
+            CallCountConstraint callCountConstraint)
         {
             Guard.AgainstNull(fakeManager, nameof(fakeManager));
             Guard.AgainstNull(callPredicate, nameof(callPredicate));
             Guard.AgainstNull(callDescriber, nameof(callDescriber));
-            Guard.AgainstNull(repeatConstraint, nameof(repeatConstraint));
+            Guard.AgainstNull(callCountConstraint, nameof(callCountConstraint));
             this.fakeManagers.Add(fakeManager);
             this.assertedCalls.Add(
-                new AssertedCall { CallDescriber = callDescriber, RepeatDescription = repeatConstraint.ToString() });
+                new AssertedCall { CallDescriber = callDescriber, MatchingCountDescription = callCountConstraint.ToString() });
 
             var allCalls = this.fakeManagers.SelectMany(f => f.GetRecordedCalls()).OrderBy(SequenceNumberManager.GetSequenceNumber).ToList();
 
             int matchedCallCount = 0;
             foreach (var currentCall in allCalls.SkipWhile(c => SequenceNumberManager.GetSequenceNumber(c) <= this.currentSequenceNumber))
             {
-                if (repeatConstraint.Matches(matchedCallCount))
+                if (callCountConstraint.Matches(matchedCallCount))
                 {
                     return;
                 }
@@ -51,16 +54,15 @@ namespace FakeItEasy.Core
                 }
             }
 
-            if (!repeatConstraint.Matches(matchedCallCount))
+            if (!callCountConstraint.Matches(matchedCallCount))
             {
-                ThrowExceptionWhenAssertionFailed(this.assertedCalls, this.callWriter, allCalls);
+                this.ThrowExceptionWhenAssertionFailed(allCalls);
             }
         }
 
-        private static void ThrowExceptionWhenAssertionFailed(
-            List<AssertedCall> assertedCalls, CallWriter callWriter, List<ICompletedFakeObjectCall> originalCallList)
+        private void ThrowExceptionWhenAssertionFailed(List<ICompletedFakeObjectCall> originalCallList)
         {
-            var message = new StringBuilderOutputWriter();
+            var message = this.outputWriterFactory(new StringBuilder());
 
             message.WriteLine();
             message.WriteLine();
@@ -72,13 +74,12 @@ namespace FakeItEasy.Core
 
                 using (message.Indent())
                 {
-                    foreach (var call in assertedCalls)
+                    foreach (var call in this.assertedCalls)
                     {
                         message.Write("'");
                         call.CallDescriber.Invoke(message);
                         message.Write("' ");
-                        message.Write("repeated ");
-                        message.Write(call.RepeatDescription);
+                        message.Write(call.MatchingCountDescription);
                         message.WriteLine();
                     }
                 }
@@ -88,7 +89,7 @@ namespace FakeItEasy.Core
 
                 using (message.Indent())
                 {
-                    callWriter.WriteCalls(originalCallList, message);
+                    this.callWriter.WriteCalls(originalCallList, message);
                 }
             }
 
@@ -98,7 +99,7 @@ namespace FakeItEasy.Core
         private struct AssertedCall
         {
             public Action<IOutputWriter> CallDescriber;
-            public string RepeatDescription;
+            public string MatchingCountDescription;
         }
     }
 }

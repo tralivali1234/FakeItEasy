@@ -1,4 +1,4 @@
-﻿namespace FakeItEasy
+namespace FakeItEasy
 {
     using System;
     using FakeItEasy.Core;
@@ -23,6 +23,8 @@
         public static string FakeCreationExceptionDefault =>
             "Unable to create fake object.";
 
+        public static string ArgumentConstraintCannotBeNestedInArgument => "An argument constraint, such as That, Ignored, or _, cannot be nested in an argument.";
+
         public static string WrongConstructorExpressionType(Type actualConstructorType, Type expectedConstructorType) =>
             $"Supplied constructor is for type {actualConstructorType}, but must be for {expectedConstructorType}.";
 
@@ -34,5 +36,8 @@
             var callFormatter = ServiceLocator.Current.Resolve<IFakeObjectCallFormatter>();
             return $"Call to unconfigured method of strict fake: {callFormatter.GetDescription(call)}.";
         }
+
+        public static string ArgumentConstraintHasWrongType(Type constraintType, Type parameterType) =>
+            $"Argument constraint is of type {constraintType}, but parameter is of type {parameterType}. No call can match this constraint.";
     }
 }

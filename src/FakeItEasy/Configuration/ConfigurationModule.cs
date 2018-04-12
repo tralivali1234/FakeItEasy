@@ -4,10 +4,9 @@ namespace FakeItEasy.Configuration
     using FakeItEasy.Expressions;
     using FakeItEasy.IoC;
 
-    internal class ConfigurationModule
-        : Module
+    internal static class ConfigurationModule
     {
-        public override void RegisterDependencies(DictionaryContainer container)
+        public static void RegisterDependencies(DictionaryContainer container)
         {
             container.RegisterSingleton<IConfigurationFactory>(c =>
                 new ConfigurationFactory(c));
@@ -33,7 +32,7 @@ namespace FakeItEasy.Configuration
 
             private RuleBuilder.Factory BuilderFactory => this.Container.Resolve<RuleBuilder.Factory>();
 
-            public IVoidArgumentValidationConfiguration CreateConfiguration(FakeManager fakeObject, BuildableCallRule callRule)
+            public IAnyCallConfigurationWithVoidReturnType CreateConfiguration(FakeManager fakeObject, BuildableCallRule callRule)
             {
                 return this.BuilderFactory.Invoke(callRule, fakeObject);
             }

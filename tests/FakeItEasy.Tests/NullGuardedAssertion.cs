@@ -37,7 +37,7 @@ namespace FakeItEasy.Tests
                     return;
                 }
 
-                var builder = new StringBuilderOutputWriter();
+                var builder = ServiceLocator.Current.Resolve<StringBuilderOutputWriter>();
                 this.WriteDescriptionTo(builder);
                 builder.WriteLine();
                 this.WriteActualValueTo(builder);
@@ -200,7 +200,7 @@ namespace FakeItEasy.Tests
 
                             var nullException = ex.InnerException as ArgumentNullException;
                             if (nullException == null ||
-                                !callThatShouldThrow.ArgumentName.Equals(nullException.ParamName))
+                                callThatShouldThrow.ArgumentName != nullException.ParamName)
                             {
                                 result.Add(callThatShouldThrow);
                             }

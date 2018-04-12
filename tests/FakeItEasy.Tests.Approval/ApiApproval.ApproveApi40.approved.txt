@@ -33,6 +33,7 @@ namespace Castle.DynamicProxy
     public interface IProxyTargetAccessor
     {
         object DynProxyGetTarget();
+        void DynProxySetTarget(object target);
         Castle.DynamicProxy.IInterceptor[] GetInterceptors();
     }
 }
@@ -130,7 +131,9 @@ namespace FakeItEasy
             where T :  struct { }
         public static string IsNullOrEmpty(this FakeItEasy.IArgumentConstraintManager<string> manager) { }
         public static T IsSameAs<T>(this FakeItEasy.IArgumentConstraintManager<T> manager, T value) { }
-        public static T IsSameSequenceAs<T>(this FakeItEasy.IArgumentConstraintManager<T> manager, System.Collections.IEnumerable value)
+        public static T IsSameSequenceAs<T>(this FakeItEasy.IArgumentConstraintManager<T> manager, System.Collections.IEnumerable values)
+            where T : System.Collections.IEnumerable { }
+        public static T IsSameSequenceAs<T>(this FakeItEasy.IArgumentConstraintManager<T> manager, params object[] values)
             where T : System.Collections.IEnumerable { }
         public static T Matches<T>(this FakeItEasy.IArgumentConstraintManager<T> scope, System.Func<T, bool> predicate, string description) { }
         public static T Matches<T>(this FakeItEasy.IArgumentConstraintManager<T> manager, System.Func<T, bool> predicate, string descriptionFormat, params object[] args) { }
@@ -158,6 +161,12 @@ namespace FakeItEasy
     public class static AssertConfigurationExtensions
     {
         public static FakeItEasy.Configuration.UnorderedCallAssertion MustHaveHappened(this FakeItEasy.Configuration.IAssertConfiguration configuration) { }
+        public static FakeItEasy.Configuration.UnorderedCallAssertion MustHaveHappenedOnceExactly(this FakeItEasy.Configuration.IAssertConfiguration configuration) { }
+        public static FakeItEasy.Configuration.UnorderedCallAssertion MustHaveHappenedOnceOrLess(this FakeItEasy.Configuration.IAssertConfiguration configuration) { }
+        public static FakeItEasy.Configuration.UnorderedCallAssertion MustHaveHappenedOnceOrMore(this FakeItEasy.Configuration.IAssertConfiguration configuration) { }
+        public static FakeItEasy.Configuration.UnorderedCallAssertion MustHaveHappenedTwiceExactly(this FakeItEasy.Configuration.IAssertConfiguration configuration) { }
+        public static FakeItEasy.Configuration.UnorderedCallAssertion MustHaveHappenedTwiceOrLess(this FakeItEasy.Configuration.IAssertConfiguration configuration) { }
+        public static FakeItEasy.Configuration.UnorderedCallAssertion MustHaveHappenedTwiceOrMore(this FakeItEasy.Configuration.IAssertConfiguration configuration) { }
         public static void MustNotHaveHappened(this FakeItEasy.Configuration.IAssertConfiguration configuration) { }
     }
     public class static AsyncReturnValueConfigurationExtensions
@@ -341,6 +350,11 @@ namespace FakeItEasy
             [return: System.Runtime.CompilerServices.DynamicAttribute()]
             public static object With(params object[] arguments) { }
         }
+        public class static FreeForm<TEventHandler>
+        
+        {
+            public static TEventHandler With(params object[] arguments) { }
+        }
     }
     public class static RepeatConfigurationExtensions
     {
@@ -372,6 +386,12 @@ namespace FakeItEasy
         public static FakeItEasy.Configuration.IAfterCallConfiguredWithOutAndRefParametersConfiguration<FakeItEasy.Configuration.IReturnValueConfiguration<System.Threading.Tasks.Task<TReturnType>>> ReturnsLazily<TReturnType, T1, T2, T3, T4>(this FakeItEasy.Configuration.IReturnValueConfiguration<System.Threading.Tasks.Task<TReturnType>> configuration, System.Func<T1, T2, T3, T4, TReturnType> valueProducer) { }
         public static void ReturnsNextFromSequence<T>(this FakeItEasy.Configuration.IReturnValueConfiguration<T> configuration, params T[] values) { }
         public static void ReturnsNextFromSequence<T>(this FakeItEasy.Configuration.IReturnValueConfiguration<System.Threading.Tasks.Task<T>> configuration, params T[] values) { }
+    }
+    public abstract class Times
+    {
+        public static FakeItEasy.Times Exactly { get; }
+        public static FakeItEasy.Times OrLess { get; }
+        public static FakeItEasy.Times OrMore { get; }
     }
     [System.AttributeUsageAttribute(System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.All)]
     [System.ObsoleteAttribute("Test fixture initialization will be removed in version 5.0.0.")]
@@ -409,8 +429,10 @@ namespace FakeItEasy.Configuration
     {
         FakeItEasy.Configuration.IAnyCallConfigurationWithReturnTypeSpecified<object> WithNonVoidReturnType();
         FakeItEasy.Configuration.IAnyCallConfigurationWithReturnTypeSpecified<TMember> WithReturnType<TMember>();
+        FakeItEasy.Configuration.IAnyCallConfigurationWithVoidReturnType WithVoidReturnType();
     }
     public interface IAnyCallConfigurationWithReturnTypeSpecified<T> : FakeItEasy.Configuration.IArgumentValidationConfiguration<FakeItEasy.Configuration.IReturnValueConfiguration<T>>, FakeItEasy.Configuration.IAssertConfiguration, FakeItEasy.Configuration.ICallbackConfiguration<FakeItEasy.Configuration.IReturnValueConfiguration<T>>, FakeItEasy.Configuration.ICallBaseConfiguration<FakeItEasy.Configuration.IReturnValueConfiguration<T>>, FakeItEasy.Configuration.IExceptionThrowerConfiguration<FakeItEasy.Configuration.IReturnValueConfiguration<T>>, FakeItEasy.Configuration.IOutAndRefParametersConfiguration<FakeItEasy.Configuration.IReturnValueConfiguration<T>>, FakeItEasy.Configuration.IReturnValueArgumentValidationConfiguration<T>, FakeItEasy.Configuration.IReturnValueConfiguration<T>, FakeItEasy.Configuration.IWhereConfiguration<FakeItEasy.Configuration.IAnyCallConfigurationWithReturnTypeSpecified<T>>, FakeItEasy.IHideObjectMembers { }
+    public interface IAnyCallConfigurationWithVoidReturnType : FakeItEasy.Configuration.IArgumentValidationConfiguration<FakeItEasy.Configuration.IVoidConfiguration>, FakeItEasy.Configuration.IAssertConfiguration, FakeItEasy.Configuration.ICallbackConfiguration<FakeItEasy.Configuration.IVoidConfiguration>, FakeItEasy.Configuration.ICallBaseConfiguration<FakeItEasy.Configuration.IVoidConfiguration>, FakeItEasy.Configuration.IDoNothingConfiguration<FakeItEasy.Configuration.IVoidConfiguration>, FakeItEasy.Configuration.IExceptionThrowerConfiguration<FakeItEasy.Configuration.IVoidConfiguration>, FakeItEasy.Configuration.IOutAndRefParametersConfiguration<FakeItEasy.Configuration.IVoidConfiguration>, FakeItEasy.Configuration.IVoidArgumentValidationConfiguration, FakeItEasy.Configuration.IVoidConfiguration, FakeItEasy.Configuration.IWhereConfiguration<FakeItEasy.Configuration.IAnyCallConfigurationWithVoidReturnType>, FakeItEasy.IHideObjectMembers { }
     public interface IArgumentValidationConfiguration<out TInterface> : FakeItEasy.IHideObjectMembers
     
     {
@@ -419,6 +441,8 @@ namespace FakeItEasy.Configuration
     public interface IAssertConfiguration : FakeItEasy.IHideObjectMembers
     {
         FakeItEasy.Configuration.UnorderedCallAssertion MustHaveHappened(FakeItEasy.Repeated repeatConstraint);
+        FakeItEasy.Configuration.UnorderedCallAssertion MustHaveHappened(int numberOfTimes, FakeItEasy.Times timesOption);
+        FakeItEasy.Configuration.UnorderedCallAssertion MustHaveHappenedANumberOfTimesMatching(System.Linq.Expressions.Expression<System.Func<int, bool>> predicate);
     }
     public interface ICallbackConfiguration<out TInterface> : FakeItEasy.IHideObjectMembers
     
@@ -469,7 +493,7 @@ namespace FakeItEasy.Configuration
     public interface IRepeatConfiguration<out TInterface> : FakeItEasy.IHideObjectMembers
     
     {
-        FakeItEasy.Configuration.IThenConfiguration<TInterface> NumberOfTimes(int numberOfTimesToRepeat);
+        FakeItEasy.Configuration.IThenConfiguration<TInterface> NumberOfTimes(int numberOfTimes);
     }
     public interface IRepeatSpecification : FakeItEasy.IHideObjectMembers
     {

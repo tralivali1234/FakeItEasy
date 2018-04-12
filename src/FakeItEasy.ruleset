@@ -1,8 +1,9 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <RuleSet Name="FakeItEasy" ToolsVersion="11.0">
   <Include Path="allrules.ruleset" Action="Default" />
   <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
     <Rule Id="CA1020" Action="None" />
+    <Rule Id="CA1200" Action="None" />
     <Rule Id="CA1305" Action="None" />
   </Rules>
   <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
@@ -11,6 +12,7 @@
     <Rule Id="SA1124" Action="Warning" />
     <Rule Id="SA1127" Action="None" />
     <Rule Id="SA1128" Action="None" />
+    <Rule Id="SA1413" Action="None" />
     <Rule Id="SA1600" Action="None" />
     <Rule Id="SA1628" Action="Warning" />
     <Rule Id="SA1629" Action="Warning" />

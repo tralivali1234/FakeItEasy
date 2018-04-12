@@ -1,8 +1,9 @@
-﻿namespace FakeItEasy
+namespace FakeItEasy
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Text;
     using FakeItEasy.Configuration;
     using FakeItEasy.Core;
     using FakeItEasy.Creation;
@@ -15,8 +16,7 @@
     /// Handles the registration of root dependencies in an IoC-container.
     /// </summary>
     [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Container configuration.")]
-    internal class RootModule
-        : Module
+    internal static class RootModule
     {
         /// <summary>
         /// Registers the dependencies.
@@ -25,7 +25,7 @@
         [SuppressMessage("Microsoft.Maintainability", "CA1505:AvoidUnmaintainableCode", Justification = "Container configuration.")]
         [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Container configuration.")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Container configuration.")]
-        public override void RegisterDependencies(DictionaryContainer container)
+        public static void RegisterDependencies(DictionaryContainer container)
         {
             container.RegisterSingleton(c =>
                 new DynamicOptionsBuilder(
@@ -42,7 +42,7 @@
             container.RegisterSingleton(c =>
                 new MethodInfoManager());
 
-            container.Register<FakeAsserter.Factory>(c => calls => new FakeAsserter(calls, c.Resolve<CallWriter>()));
+            container.Register<FakeAsserter.Factory>(c => calls => new FakeAsserter(calls, c.Resolve<CallWriter>(), c.Resolve<StringBuilderOutputWriter.Factory>()));
 
             container.RegisterSingleton<FakeManager.Factory>(c =>
                 (fakeObjectType, proxy) => new FakeManager(fakeObjectType, proxy, c.Resolve<IFakeManagerAccessor>()));
@@ -55,7 +55,7 @@
                 new DefaultFakeObjectCallFormatter(c.Resolve<ArgumentValueFormatter>(), c.Resolve<IFakeManagerAccessor>()));
 
             container.RegisterSingleton(c =>
-                new ArgumentValueFormatter(c.Resolve<IEnumerable<IArgumentValueFormatter>>()));
+                new ArgumentValueFormatter(c.Resolve<IEnumerable<IArgumentValueFormatter>>(), c.Resolve<StringBuilderOutputWriter.Factory>()));
 
             container.RegisterSingleton(c =>
                 new CallWriter(c.Resolve<IFakeObjectCallFormatter>(), c.Resolve<IEqualityComparer<IFakeObjectCall>>()));
@@ -104,11 +104,15 @@
 
             container.Register<IArgumentConstraintManagerFactory>(c => new ArgumentConstraintManagerFactory());
 
-            container.RegisterSingleton<IOutputWriter>(c => new DefaultOutputWriter(Console.Write));
+            container.RegisterSingleton<IOutputWriter>(c => new DefaultOutputWriter(Console.Write, c.Resolve<ArgumentValueFormatter>()));
+
+            container.RegisterSingleton<StringBuilderOutputWriter.Factory>(c => builder => new StringBuilderOutputWriter(builder, c.Resolve<ArgumentValueFormatter>()));
+
+            container.Register(c => c.Resolve<StringBuilderOutputWriter.Factory>().Invoke(new StringBuilder()));
 
             container.RegisterSingleton(c => new EventHandlerArgumentProviderMap());
 
-            container.Register(c => new SequentialCallContext(c.Resolve<CallWriter>()));
+            container.Register(c => new SequentialCallContext(c.Resolve<CallWriter>(), c.Resolve<StringBuilderOutputWriter.Factory>()));
         }
 
         private class ExpressionCallMatcherFactory
@@ -121,13 +125,10 @@
                 this.serviceLocator = serviceLocator;
             }
 
-            public ICallMatcher CreateCallMatcher(ParsedCallExpression callSpecification)
-            {
-                return new ExpressionCallMatcher(
+            public ICallMatcher CreateCallMatcher(ParsedCallExpression callSpecification) => new ExpressionCallMatcher(
                     callSpecification,
                     this.serviceLocator.Resolve<ExpressionArgumentConstraintFactory>(),
                     this.serviceLocator.Resolve<MethodInfoManager>());
-            }
         }
 
         private class ResolverFakeObjectCreator

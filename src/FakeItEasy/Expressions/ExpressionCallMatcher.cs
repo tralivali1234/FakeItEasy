@@ -4,7 +4,6 @@ namespace FakeItEasy.Expressions
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    using System.Text;
     using FakeItEasy.Configuration;
     using FakeItEasy.Core;
     using FakeItEasy.Expressions.ArgumentConstraints;
@@ -28,20 +27,19 @@ namespace FakeItEasy.Expressions
         public ExpressionCallMatcher(ParsedCallExpression parsedExpression, ExpressionArgumentConstraintFactory constraintFactory, MethodInfoManager methodInfoManager)
         {
             this.methodInfoManager = methodInfoManager;
-
             this.Method = parsedExpression.CalledMethod;
 
             this.argumentConstraints = GetArgumentConstraints(parsedExpression.ArgumentsExpressions, constraintFactory).ToArray();
             this.argumentsPredicate = this.ArgumentsMatchesArgumentConstraints;
         }
 
-        /// <summary>
-        /// Gets a human readable description of calls that will be matched by this
-        /// matcher.
-        /// </summary>
-        public virtual string DescriptionOfMatchingCall => this.ToString();
-
         private MethodInfo Method { get; }
+
+        /// <summary>
+        /// Writes a description of calls the rule is applicable to.
+        /// </summary>
+        /// <param name="writer">The writer on which to describe the call.</param>
+        public virtual void DescribeCallOn(IOutputWriter writer) => CallConstraintDescriber.DescribeCallOn(writer, this.Method, this.argumentConstraints);
 
         /// <summary>
         /// Matches the specified call against the expression.
@@ -56,30 +54,10 @@ namespace FakeItEasy.Expressions
                 && this.ArgumentsMatches(call.Arguments);
         }
 
-        /// <summary>
-        /// Gets a description of the call.
-        /// </summary>
-        /// <returns>Description of the call.</returns>
-        public override string ToString()
-        {
-            var result = new StringBuilder();
-
-            result.Append(this.Method.DeclaringType);
-            result.Append(".");
-            result.Append(this.Method.Name);
-            result.Append(this.Method.GetGenericArgumentsString());
-
-            this.AppendArgumentsListString(result);
-
-            return result.ToString();
-        }
-
         public virtual void UsePredicateToValidateArguments(Func<ArgumentCollection, bool> predicate)
         {
             this.argumentsPredicate = predicate;
-
-            var numberOfValidators = this.argumentConstraints.Count();
-            this.argumentConstraints = Enumerable.Repeat<IArgumentConstraint>(new PredicatedArgumentConstraint(), numberOfValidators);
+            this.argumentConstraints = this.argumentConstraints.Select(a => new PredicatedArgumentConstraint()).ToArray();
         }
 
         public Func<IFakeObjectCall, ICollection<object>> GetOutAndRefParametersValueProducer()
@@ -96,43 +74,13 @@ namespace FakeItEasy.Expressions
             return null;
         }
 
-        private static IEnumerable<IArgumentConstraint> GetArgumentConstraints(IEnumerable<ParsedArgumentExpression> argumentExpressions, ExpressionArgumentConstraintFactory constraintFactory)
-        {
-            if (argumentExpressions == null)
-            {
-                return Enumerable.Empty<IArgumentConstraint>();
-            }
-
-            return
-                from argument in argumentExpressions
-                select constraintFactory.GetArgumentConstraint(argument);
-        }
+        private static IEnumerable<IArgumentConstraint> GetArgumentConstraints(IEnumerable<ParsedArgumentExpression> argumentExpressions, ExpressionArgumentConstraintFactory constraintFactory) =>
+            from argument in argumentExpressions
+            select constraintFactory.GetArgumentConstraint(argument);
 
         private bool InvokesSameMethodOnTarget(Type type, MethodInfo first, MethodInfo second)
         {
             return this.methodInfoManager.WillInvokeSameMethodOnTarget(type, first, second);
-        }
-
-        private void AppendArgumentsListString(StringBuilder result)
-        {
-            result.Append("(");
-            int index = 0;
-            var parameters = this.Method.GetParameters();
-
-            foreach (var constraint in this.argumentConstraints)
-            {
-                if (index > 0)
-                {
-                    result.Append(", ");
-                }
-
-                var parameter = parameters[index];
-                result.Append(parameter.Name + ": ");
-                constraint.WriteDescription(new StringBuilderOutputWriter(result));
-                index++;
-            }
-
-            result.Append(")");
         }
 
         private bool ArgumentsMatches(ArgumentCollection argumentCollection)

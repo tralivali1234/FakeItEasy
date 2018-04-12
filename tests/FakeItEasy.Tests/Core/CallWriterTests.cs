@@ -23,7 +23,7 @@ namespace FakeItEasy.Tests.Core
                 .Returns("Default call description");
 
             this.calls = new List<IFakeObjectCall>();
-            this.writer = new StringBuilderOutputWriter();
+            this.writer = ServiceLocator.Current.Resolve<StringBuilderOutputWriter>();
         }
 
         [Fact]
@@ -77,7 +77,7 @@ namespace FakeItEasy.Tests.Core
             // Assert
             var message = this.writer.Builder.ToString();
             var expectedMessage =
-@"1:  Fake call repeated 9 times
+@"1:  Fake call 9 times
 ...
 10: Other call";
 

@@ -6,11 +6,7 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\FakeItEasy.snk</AssemblyOriginatorKeyFile>
-    <CodeAnalysisRuleSet>..\..\FakeItEasy.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-
-  <Import Project="../packages.targets" />
 
   <PropertyGroup Label="Package properties">
     <Title>FakeItEasy - Mocking made faking easy!</Title>
@@ -20,9 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <CodeAnalysisDictionary Include="..\..\FakeItEasy.Dictionary.xml" />
     <Compile Include="../*.cs" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.0.0" PrivateAssets="all" />
   </ItemGroup>
 
   <!-- Debug -->
@@ -30,7 +24,7 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <DebugType>full</DebugType>
   </PropertyGroup>
-  
+
   <!-- Release -->
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
@@ -41,11 +35,11 @@
   <!-- .NET Standard 1.6 -->
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard1.6'">
-    <DefineConstants>$(DefineConstants);FEATURE_NETCORE_REFLECTION;FEATURE_EXCEPTION_DISPATCH_INFO</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_NETCORE_REFLECTION;FEATURE_EXCEPTION_DISPATCH_INFO;FEATURE_ARRAY_EMPTY</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.6'">
-    <PackageReference Include="Castle.Core" Version="4.1.0" />
+    <PackageReference Include="Castle.Core" Version="4.2.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="1.0.0" />
     <PackageReference Include="System.Collections.Concurrent" Version="4.3.0" />
     <PackageReference Include="System.Runtime.Loader" Version="4.0.0" />
@@ -59,11 +53,11 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net45'">
     <PackageReference Include="ILMerge" Version="2.14.1208" PrivateAssets="all" />
-    <PackageReference Include="Castle.Core" Version="4.1.0" PrivateAssets="all" />
+    <PackageReference Include="Castle.Core" Version="4.2.1" PrivateAssets="all" />
   </ItemGroup>
 
   <Target Name="ILMerge45" AfterTargets="Build" Condition="'$(TargetFramework)' == 'net45'">
-    <Exec Command="&quot;$(NuGetPackageRoot)\ilmerge\2.14.1208\tools\ILmerge.exe&quot; /keyfile:..\..\FakeItEasy.snk /lib:$(OutputPath) /targetplatform:&quot;v4,$(MSBuildProgramFiles32)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5&quot; /internalize:&quot;..\ILMerge.Internalize.Exclude.txt&quot; /out:@(MainAssembly) /log:$(OutputPath)ILMerge.log &quot;@(IntermediateAssembly)&quot; &quot;$(OutputPath)Castle.Core.dll&quot;" />
+    <Exec Command="&quot;$(NuGetPackageRoot)\ilmerge\2.14.1208\tools\ILmerge.exe&quot; /keyfile:..\FakeItEasy.snk /lib:$(OutputPath) /targetplatform:&quot;v4,$(MSBuildProgramFiles32)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5&quot; /internalize:&quot;..\ILMerge.Internalize.Exclude.txt&quot; /out:@(MainAssembly) /log:$(OutputPath)ILMerge.log &quot;@(IntermediateAssembly)&quot; &quot;$(OutputPath)Castle.Core.dll&quot;" />
   </Target>
 
   <!-- .NET 4.0 -->
@@ -74,11 +68,18 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net40'">
     <PackageReference Include="ILMerge" Version="2.14.1208" PrivateAssets="all" />
-    <PackageReference Include="Castle.Core" Version="4.1.0" PrivateAssets="all" />
+    <PackageReference Include="Castle.Core" Version="4.2.1" PrivateAssets="all" />
   </ItemGroup>
 
   <Target Name="ILMerge40" AfterTargets="Build" Condition="'$(TargetFramework)' == 'net40'">
-    <Exec Command="&quot;$(NuGetPackageRoot)\ilmerge\2.14.1208\tools\ILmerge.exe&quot; /keyfile:..\..\FakeItEasy.snk /lib:$(OutputPath) /targetplatform:&quot;v4,$(MSBuildProgramFiles32)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0&quot; /internalize:&quot;..\ILMerge.Internalize.Exclude.txt&quot; /out:@(MainAssembly) /log:$(OutputPath)ILMerge.log &quot;@(IntermediateAssembly)&quot; &quot;$(OutputPath)Castle.Core.dll&quot;" />
+    <Exec Command="&quot;$(NuGetPackageRoot)\ilmerge\2.14.1208\tools\ILmerge.exe&quot; /keyfile:..\FakeItEasy.snk /lib:$(OutputPath) /targetplatform:&quot;v4,$(MSBuildProgramFiles32)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0&quot; /internalize:&quot;..\ILMerge.Internalize.Exclude.txt&quot; /out:@(MainAssembly) /log:$(OutputPath)ILMerge.log &quot;@(IntermediateAssembly)&quot; &quot;$(OutputPath)Castle.Core.dll&quot;" />
   </Target>
+
+
+  <!-- Include PDB in package -->
+
+  <ItemGroup>
+    <None Include="$(OutputPath)/**/$(AssemblyName).pdb" Pack="true" PackagePath="lib" Visible="false" />
+  </ItemGroup>
 
 </Project>

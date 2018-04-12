@@ -235,7 +235,7 @@ namespace FakeItEasy.Tests.Configuration
             // Arrange
             this.rule.DescriptionOfValidCallReturnValue = "description";
 
-            var writer = new StringBuilderOutputWriter();
+            var writer = ServiceLocator.Current.Resolve<StringBuilderOutputWriter>();
 
             // Act
             this.rule.WriteDescriptionOfValidCall(writer);
@@ -252,7 +252,7 @@ namespace FakeItEasy.Tests.Configuration
             this.rule.ApplyWherePredicate(x => true, x => x.Write("description of first where"));
             this.rule.ApplyWherePredicate(x => true, x => x.Write("description of second where"));
 
-            var descriptionWriter = new StringBuilderOutputWriter();
+            var descriptionWriter = ServiceLocator.Current.Resolve<StringBuilderOutputWriter>();
 
             // Act
             this.rule.WriteDescriptionOfValidCall(descriptionWriter);
@@ -278,7 +278,7 @@ namespace FakeItEasy.Tests.Configuration
         [Fact]
         public void OutAndRefParameterProducer_should_not_be_settable_more_than_once()
         {
-            this.rule.OutAndRefParametersValueProducer = x => new object[0];
+            this.rule.OutAndRefParametersValueProducer = x => Array.Empty<object>();
 
             var exception = Record.Exception(() => this.rule.OutAndRefParametersValueProducer = x => new object[] { "test" });
             exception.Should().BeAnExceptionOfType<InvalidOperationException>();
@@ -314,7 +314,7 @@ namespace FakeItEasy.Tests.Configuration
 
             public bool OnIsApplicableToWasCalled { get; private set; }
 
-            public override string DescriptionOfValidCall => this.DescriptionOfValidCallReturnValue;
+            public override void DescribeCallOn(IOutputWriter writer) => writer.Write(this.DescriptionOfValidCallReturnValue);
 
             public override void UsePredicateToValidateArguments(Func<ArgumentCollection, bool> argumentsPredicate)
             {

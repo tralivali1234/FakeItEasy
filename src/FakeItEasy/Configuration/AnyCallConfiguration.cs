@@ -2,6 +2,7 @@ namespace FakeItEasy.Configuration
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq.Expressions;
     using FakeItEasy.Core;
 
     internal class AnyCallConfiguration
@@ -31,6 +32,12 @@ namespace FakeItEasy.Configuration
         {
             this.configuredRule.ApplicableToAllNonVoidReturnTypes = true;
             return this.configurationFactory.CreateConfiguration<object>(this.manager, this.configuredRule);
+        }
+
+        public IAnyCallConfigurationWithVoidReturnType WithVoidReturnType()
+        {
+            this.configuredRule.ApplicableToMembersWithReturnType = typeof(void);
+            return this.configurationFactory.CreateConfiguration(this.manager, this.configuredRule);
         }
 
         public IAfterCallConfiguredConfiguration<IVoidConfiguration> DoesNothing() => this.VoidConfiguration.DoesNothing();
@@ -75,6 +82,20 @@ namespace FakeItEasy.Configuration
 
         public UnorderedCallAssertion MustHaveHappened(Repeated repeatConstraint) =>
             this.VoidConfiguration.MustHaveHappened(repeatConstraint);
+
+        public UnorderedCallAssertion MustHaveHappened(int numberOfTimes, Times timesOption)
+        {
+            Guard.AgainstNull(timesOption, nameof(timesOption));
+
+            return this.VoidConfiguration.MustHaveHappened(numberOfTimes, timesOption);
+        }
+
+        public UnorderedCallAssertion MustHaveHappenedANumberOfTimesMatching(Expression<Func<int, bool>> predicate)
+        {
+            Guard.AgainstNull(predicate, nameof(predicate));
+
+            return this.VoidConfiguration.MustHaveHappenedANumberOfTimesMatching(predicate);
+        }
 
         public IAnyCallConfigurationWithNoReturnTypeSpecified Where(Func<IFakeObjectCall, bool> predicate, Action<IOutputWriter> descriptionWriter)
         {

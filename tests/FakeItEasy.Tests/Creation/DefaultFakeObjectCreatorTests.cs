@@ -89,7 +89,7 @@ namespace FakeItEasy.Tests.Creation
 
             // Assert
             A.CallTo(() => this.fakeCallProcessorProviderFactory(typeof(TypeWithMultipleConstructors), options))
-                .MustHaveHappened(Repeated.Exactly.Times(3));
+                .MustHaveHappened(3, Times.Exactly);
         }
 
         [Fact]
@@ -324,7 +324,7 @@ namespace FakeItEasy.Tests.Creation
 
                     foreach (var constructorPair in x.Zip(constructors, (constructor1, constructor2) => new { Constructor1 = constructor1, Constructor2 = constructor2 }))
                     {
-                        if (!string.Equals(constructorPair.Constructor1.ReasonForFailure, constructorPair.Constructor2.ReasonForFailure))
+                        if (constructorPair.Constructor1.ReasonForFailure != constructorPair.Constructor2.ReasonForFailure)
                         {
                             return false;
                         }

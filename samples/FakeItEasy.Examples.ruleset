@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RuleSet Name="FakeItEasy Examples" ToolsVersion="11.0">
-  <Include Path="..\fakeiteasy.ruleset" Action="Default" />
+  <Include Path="..\src\fakeiteasy.ruleset" Action="Default" />
   <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
     <Rule Id="CA1014" Action="None" />
     <Rule Id="CA1016" Action="None" />
@@ -13,5 +13,6 @@
     <Rule Id="CA1824" Action="None" />
     <Rule Id="CA2201" Action="None" />
     <Rule Id="CA2210" Action="None" />
+    <Rule Id="SA0001" Action="None" />
   </Rules>
 </RuleSet>

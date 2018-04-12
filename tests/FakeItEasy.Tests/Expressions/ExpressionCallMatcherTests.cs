@@ -1,6 +1,7 @@
 namespace FakeItEasy.Tests.Expressions
 {
     using System;
+    using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
     using FakeItEasy.Configuration;
@@ -15,6 +16,7 @@ namespace FakeItEasy.Tests.Expressions
         private readonly ExpressionArgumentConstraintFactory constraintFactory;
         private readonly MethodInfoManager methodInfoManager;
         private readonly CallExpressionParser parser;
+        private readonly StringBuilderOutputWriter.Factory outputWriterFactory;
 
         public ExpressionCallMatcherTests()
         {
@@ -25,6 +27,13 @@ namespace FakeItEasy.Tests.Expressions
 
             this.methodInfoManager = A.Fake<MethodInfoManager>();
             this.parser = new CallExpressionParser();
+            this.outputWriterFactory =
+                builder =>
+                    new StringBuilderOutputWriter(
+                        builder,
+                        new ArgumentValueFormatter(
+                            Enumerable.Empty<IArgumentValueFormatter>(),
+                            this.outputWriterFactory));
         }
 
         [Fact]
@@ -135,7 +144,7 @@ namespace FakeItEasy.Tests.Expressions
         }
 
         [Fact]
-        public void ToString_should_write_full_method_name_with_type_name_and_arguments_list()
+        public void DescriptionOfMatchingCall_should_write_full_method_name_with_type_name_and_arguments_list()
         {
             var constraint = A.Fake<IArgumentConstraint>();
             A.CallTo(() => constraint.WriteDescription(A<IOutputWriter>._))
@@ -145,9 +154,11 @@ namespace FakeItEasy.Tests.Expressions
 
             var matcher = this.CreateMatcher<IFoo>(x => x.Bar(1, 2));
 
-            matcher.ToString().Should().Be("FakeItEasy.Tests.IFoo.Bar(argument: <FOO>, argument2: <FOO>)");
+            var writer = ServiceLocator.Current.Resolve<StringBuilderOutputWriter>();
+            matcher.DescribeCallOn(writer);
 
-            A.CallTo(() => this.constraintFactory.GetArgumentConstraint(A<ParsedArgumentExpression>._)).MustHaveHappened(Repeated.Exactly.Twice);
+            writer.Builder.ToString().Should().Be("FakeItEasy.Tests.IFoo.Bar(argument: <FOO>, argument2: <FOO>)");
+            A.CallTo(() => this.constraintFactory.GetArgumentConstraint(A<ParsedArgumentExpression>._)).MustHaveHappenedTwiceExactly();
         }
 
         [Fact]
@@ -186,13 +197,16 @@ namespace FakeItEasy.Tests.Expressions
         }
 
         [Fact]
-        public void ToString_should_write_predicate_when_predicate_is_used_to_validate_arguments()
+        public void DescriptionOfMatchingCall_should_write_predicate_when_predicate_is_used_to_validate_arguments()
         {
             var matcher = this.CreateMatcher<IFoo>(x => x.Bar(null, null));
 
             matcher.UsePredicateToValidateArguments(x => true);
 
-            matcher.ToString().Should().Be("FakeItEasy.Tests.IFoo.Bar(argument: <Predicated>, argument2: <Predicated>)");
+            var writer = ServiceLocator.Current.Resolve<StringBuilderOutputWriter>();
+            matcher.DescribeCallOn(writer);
+
+            writer.Builder.ToString().Should().Be("FakeItEasy.Tests.IFoo.Bar(argument: <Predicated>, argument2: <Predicated>)");
         }
 
         [Fact]

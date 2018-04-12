@@ -148,14 +148,14 @@ namespace FakeItEasy.Analyzer.Tests
 
 ";
 
-           this.VerifyCSharpDiagnostic(
+            this.VerifyCSharpDiagnostic(
                 Test,
                 new DiagnosticResult
                 {
                     Id = "FakeItEasy0002",
                     Message =
                         "Member Bar can not be intercepted. Only interface members and virtual, overriding, and abstract members can be intercepted.",
-                    Severity = DiagnosticSeverity.Warning,
+                    Severity = DiagnosticSeverity.Error,
                     Locations = new[] { new DiagnosticResultLocation("Test0.cs", 11, 28) }
                 });
         }
@@ -195,7 +195,7 @@ namespace FakeItEasy.Analyzer.Tests
          Id = "FakeItEasy0002",
          Message =
              "Member Bar can not be intercepted. Only interface members and virtual, overriding, and abstract members can be intercepted.",
-         Severity = DiagnosticSeverity.Warning,
+         Severity = DiagnosticSeverity.Error,
          Locations = new[] { new DiagnosticResultLocation("Test0.cs", 11, 28) }
      });
     }
@@ -227,16 +227,16 @@ namespace AnalyzerPrototypeSubjectStatic
 }
 ";
 
-    this.VerifyCSharpDiagnostic(
-    Test,
-    new DiagnosticResult
-    {
-        Id = "FakeItEasy0002",
-        Message =
-            "Member Bar can not be intercepted. Only interface members and virtual, overriding, and abstract members can be intercepted.",
-        Severity = DiagnosticSeverity.Warning,
-        Locations = new[] { new DiagnosticResultLocation("Test0.cs", 11, 26) }
-            });
+            this.VerifyCSharpDiagnostic(
+                Test,
+                new DiagnosticResult
+                {
+                    Id = "FakeItEasy0002",
+                    Message =
+                        "Member Bar can not be intercepted. Only interface members and virtual, overriding, and abstract members can be intercepted.",
+                    Severity = DiagnosticSeverity.Error,
+                    Locations = new[] { new DiagnosticResultLocation("Test0.cs", 11, 26) }
+                });
         }
 
         [Fact]
@@ -272,7 +272,7 @@ namespace AnalyzerPrototypeSubjectStatic
             Id = "FakeItEasy0002",
             Message =
              "Member Bar can not be intercepted. Only interface members and virtual, overriding, and abstract members can be intercepted.",
-            Severity = DiagnosticSeverity.Warning,
+            Severity = DiagnosticSeverity.Error,
             Locations = new[] { new DiagnosticResultLocation("Test0.cs", 11, 28) }
         });
         }
@@ -384,7 +384,7 @@ namespace TheNamespace
                     Id = "FakeItEasy0002",
                     Message =
                         "Member this[] can not be intercepted. Only interface members and virtual, overriding, and abstract members can be intercepted.",
-                    Severity = DiagnosticSeverity.Warning,
+                    Severity = DiagnosticSeverity.Error,
                     Locations = new[] { new DiagnosticResultLocation("Test0.cs", 16, 28) }
                 });
         }
@@ -467,7 +467,7 @@ namespace PrototypeProperty
                     Id = "FakeItEasy0002",
                     Message =
                         "Member Bar can not be intercepted. Only interface members and virtual, overriding, and abstract members can be intercepted.",
-                    Severity = DiagnosticSeverity.Warning,
+                    Severity = DiagnosticSeverity.Error,
                     Locations = new[] { new DiagnosticResultLocation("Test0.cs", 10, 31) }
                 });
          }
@@ -506,7 +506,7 @@ namespace PrototypeProperty
                     Id = "FakeItEasy0002",
                     Message =
                      "Member DifferentNameThanOtherTests can not be intercepted. Only interface members and virtual, overriding, and abstract members can be intercepted.",
-                    Severity = DiagnosticSeverity.Warning,
+                    Severity = DiagnosticSeverity.Error,
                     Locations = new[] { new DiagnosticResultLocation("Test0.cs", 11, 28) }
                 });
         }

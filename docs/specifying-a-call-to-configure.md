@@ -1,6 +1,6 @@
 # Specifying a Call to Configure
 
-One of the first steps in configuring a fake object's behaviour is to
+One of the first steps in configuring a fake object's behavior is to
 specify which call to configure. Like most FakeItEasy actions, this is
 done using a method on the `A` class: `A.CallTo`.
 
@@ -44,6 +44,18 @@ A.CallToSet(() => fakeShop.Address).DoesNothing(); // ignores the value that's s
 constrain the value that's set into the property, or the indexes that
 must be supplied when invoking an indexer.
 
+## Specifying the invocation of a delegate
+
+To specify the invocation of a delegate, just use `A.CallTo`, invoking the fake delegate as you normally would:
+
+```csharp
+var deepThought = A.Fake<Func<string, int>>();
+A.CallTo(() => deepThought.Invoke("What is the answer to life, the universe, and everything?")).Returns(42);
+
+// Note that the .Invoke part is optional:
+A.CallTo(() => deepThought("What is the answer to life, the universe, and everything?")).Returns(42);
+```
+
 ## Specifying a call to any method or property
 
 Instead of supplying an expression to identify a specific method, pass
@@ -51,6 +63,9 @@ the fake to `A.CallTo` to refer to any method on the fake:
 
 ```csharp
 A.CallTo(fakeShop).Throws(new Exception());
+
+// Or limit the calls to void methods
+A.CallTo(fakeShop).WithVoidReturnType().Throws("sugar overflow");
 
 // Or limit the calls by return type
 A.CallTo(fakeShop).WithReturnType<string>().Returns("sugar tastes good");

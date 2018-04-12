@@ -34,7 +34,7 @@ namespace FakeItEasy.Tests.Configuration
                 configuration => configuration.DoesNothing(),
                 configuration => configuration.Throws<Exception>(),
                 configuration => configuration.Invokes(DoNothing),
-                configuration => configuration.AssignsOutAndRefParametersLazily(_ => new object[0]));
+                configuration => configuration.AssignsOutAndRefParametersLazily(_ => Array.Empty<object>()));
 
         public static IEnumerable<object[]> BehaviorDefinitionActionsForNonVoid =>
             TestCases.FromObject<Action<IAnyCallConfigurationWithReturnTypeSpecified<int>>>(
@@ -216,41 +216,6 @@ namespace FakeItEasy.Tests.Configuration
 
             var valueProducer = this.ruleProducedByFactory.OutAndRefParametersValueProducer;
             valueProducer(null).Should().BeEquivalentTo(1, "foo");
-        }
-
-        [Fact]
-        public void Assert_with_void_call_should_assert_on_assertions_produced_by_factory()
-        {
-            // Arrange
-            var repeatedConstraint = Repeated.Exactly.Times(99);
-
-            // Act
-            this.builder.MustHaveHappened(repeatedConstraint);
-
-            // Assert
-            A.CallTo(() => this.asserter.AssertWasCalled(
-                A<Func<ICompletedFakeObjectCall, bool>>._,
-                this.ruleProducedByFactory.WriteDescriptionOfValidCall,
-                repeatedConstraint))
-                .MustHaveHappened();
-        }
-
-        [Fact]
-        public void Assert_with_function_call_should_assert_on_assertions_produced_by_factory()
-        {
-            // Arrange
-            var repeatedConstraint = Repeated.Exactly.Times(99);
-
-            // Act
-            var returnConfig = new RuleBuilder.ReturnValueConfiguration<int>(this.builder);
-            returnConfig.MustHaveHappened(repeatedConstraint);
-
-            // Assert
-            A.CallTo(() => this.asserter.AssertWasCalled(
-                A<Func<ICompletedFakeObjectCall, bool>>._,
-                this.ruleProducedByFactory.WriteDescriptionOfValidCall,
-                repeatedConstraint))
-                .MustHaveHappened();
         }
 
         [Fact]

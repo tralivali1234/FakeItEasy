@@ -1,4 +1,4 @@
-﻿namespace FakeItEasy.Analyzer
+namespace FakeItEasy.Analyzer
 {
     using System.Reflection;
     using System.Resources;
@@ -30,7 +30,7 @@
                 nameof(NonVirtualSetupSpecification),
                 "FakeItEasy0002",
                 "FakeItEasy.Usage",
-                DiagnosticSeverity.Warning,
+                DiagnosticSeverity.Error,
                 true);
 
         public static DiagnosticDescriptor ArgumentConstraintOutsideCallSpec { get; } =
@@ -45,6 +45,22 @@
             CreateDiagnosticDescriptor(
                 nameof(ArgumentConstraintNullabilityMismatch),
                 "FakeItEasy0004",
+                "FakeItEasy.Usage",
+                DiagnosticSeverity.Warning,
+                true);
+
+        public static DiagnosticDescriptor ArgumentConstraintTypeMismatch { get; } =
+            CreateDiagnosticDescriptor(
+                nameof(ArgumentConstraintTypeMismatch),
+                "FakeItEasy0005",
+                "FakeItEasy.Usage",
+                DiagnosticSeverity.Error,
+                true);
+
+        public static DiagnosticDescriptor RepeatedAssertion { get; } =
+            CreateDiagnosticDescriptor(
+                nameof(RepeatedAssertion),
+                "FakeItEasy0006",
                 "FakeItEasy.Usage",
                 DiagnosticSeverity.Warning,
                 true);

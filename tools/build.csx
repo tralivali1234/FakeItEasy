@@ -1,17 +1,17 @@
-#load "packages/simple-targets-csx.5.2.0/simple-targets.csx"
+#load "packages/simple-targets-csx.6.0.0/contentFiles/csx/any/simple-targets.csx"
 
 #r "System.Net.Http"
 #r "System.Xml.Linq"
 
 using System.Net.Http;
 using System.Xml.Linq;
+using System.Runtime.CompilerServices;
 using static SimpleTargets;
 
 var solutionName = "FakeItEasy";
 
 var solution = "./" + solutionName + ".sln";
 var versionInfoFile = "./src/VersionInfo.cs";
-var packagesDirectory = Path.GetFullPath("packages");
 var repoUrl = "https://github.com/FakeItEasy/FakeItEasy";
 var coverityProjectUrl = "https://scan.coverity.com/builds?project=FakeItEasy%2FFakeItEasy";
 
@@ -31,36 +31,38 @@ var pdbs = new []
     "src/FakeItEasy.Analyzer/bin/Release/FakeItEasy.Analyzer.VisualBasic.pdb"
 };
 
-var testSuites = new Dictionary<string, TestSuite[]>
+var testSuites = new Dictionary<string, string[]>
 {
-    ["unit"] = new TestSuite[]
+    ["unit"] = new[]
     {
-        new DotnetTestSuite("tests/FakeItEasy.Tests"),
-        new DotnetTestSuite("tests/FakeItEasy.Analyzer.CSharp.Tests"),
-        new DotnetTestSuite("tests/FakeItEasy.Analyzer.VisualBasic.Tests"),
+        "tests/FakeItEasy.Tests",
+        "tests/FakeItEasy.Analyzer.CSharp.Tests",
+        "tests/FakeItEasy.Analyzer.VisualBasic.Tests",
     },
-    ["integ"] = new TestSuite[]
+    ["integ"] = new[]
     {
-        new DotnetTestSuite("tests/FakeItEasy.IntegrationTests"),
-        new ClassicTestSuite("tests/FakeItEasy.IntegrationTests.VB/bin/Release/FakeItEasy.IntegrationTests.VB.dll"),
+        "tests/FakeItEasy.IntegrationTests",
+        "tests/FakeItEasy.IntegrationTests.VB",
     },
-    ["spec"] = new TestSuite[]
+    ["spec"] = new[]
     {
-        new DotnetTestSuite("tests/FakeItEasy.Specs")
+        "tests/FakeItEasy.Specs"
     },
-    ["approve"] = new TestSuite[]
+    ["approve"] = new[]
     {
-        new DotnetTestSuite("tests/FakeItEasy.Tests.Approval")
+        "tests/FakeItEasy.Tests.Approval"
     }
 };
 
 // tool locations
-var vswhere = "./packages/vswhere.1.0.62/tools/vswhere.exe";
-var gitversion = "./packages/GitVersion.CommandLine.4.0.0-beta0012/tools/GitVersion.exe";
+
+static var toolsPackagesDirectory = Path.Combine(GetCurrentScriptDirectory(), "packages");
+var vswhere = $"{toolsPackagesDirectory}/vswhere.1.0.62/tools/vswhere.exe";
+var gitversion = $"{toolsPackagesDirectory}/GitVersion.CommandLine.4.0.0-beta0012/tools/GitVersion.exe";
 var msBuild = $"{GetVSLocation()}/MSBuild/15.0/Bin/MSBuild.exe";
-var nuget = "./.nuget/NuGet.exe";
-var pdbGit = "./packages/pdbGit.3.0.41/tools/PdbGit.exe";
-static var xunit = "./packages/xunit.runner.console.2.0.0/tools/xunit.console.exe";
+var nuget = $"{GetCurrentScriptDirectory()}/.nuget/NuGet.exe";
+var pdbGit = $"{toolsPackagesDirectory}/pdbGit.3.0.41/tools/PdbGit.exe";
+static var xunit = $"{toolsPackagesDirectory}/xunit.runner.console.2.0.0/tools/xunit.console.exe";
 
 // artifact locations
 var coverityDirectory = "./artifacts/coverity";
@@ -91,10 +93,9 @@ targets.Add(
     DependsOn("clean", "coverityDirectory", "restore"),
     () =>
     {
-        var packagesDirectoryOption = $"/p:NuGetPackagesDirectory={packagesDirectory}";
         Cmd(
             "cov-build",
-            $@"--dir {coverityResultsDirectory} ""{msBuild}"" {solution} /target:Build /p:configuration=Release /nr:false /verbosity:minimal /nologo /fl /flp:LogFile=artifacts/logs/Coverity-Build.log;Verbosity=Detailed;PerformanceSummary {packagesDirectoryOption}");
+            $@"--dir {coverityResultsDirectory} ""{msBuild}"" {solution} /target:Build /p:configuration=Release /nr:false /verbosity:minimal /nologo /fl /flp:LogFile=artifacts/logs/Coverity-Build.log;Verbosity=Detailed;PerformanceSummary");
 
         var version = ReadCmdOutput(".", gitversion, "/showvariable SemVer");
         var coverityToken = Environment.GetEnvironmentVariable("COVERITY_TOKEN");
@@ -138,11 +139,7 @@ targets.Add("clean", DependsOn("logsDirectory"), () => RunMsBuild("Clean"));
 
 targets.Add(
     "restore",
-    () =>
-    {
-        Cmd(nuget, $"restore {solution}");
-        Cmd("dotnet", $"restore");
-    });
+    () => Cmd("dotnet", $"restore"));
 
 targets.Add(
     "unit",
@@ -246,18 +243,23 @@ public string ReadCmdOutput(string workingDirectory, string fileName, string arg
 
 public void RunMsBuild(string target)
 {
-    var packagesDirectoryOption = string.IsNullOrEmpty(packagesDirectory) ? "" : $"/p:NuGetPackagesDirectory={packagesDirectory}";
     Cmd(
         msBuild,
-        $"{solution} /target:{target} /p:configuration=Release /nr:false /verbosity:minimal /nologo /fl /flp:LogFile=artifacts/logs/{target}.log;Verbosity=Detailed;PerformanceSummary {packagesDirectoryOption}");
+        $"{solution} /target:{target} /p:configuration=Release /maxcpucount /nr:false /verbosity:minimal /nologo /bl:artifacts/logs/{target}.binlog");
 }
 
 public void RunTests(string target)
 {
-    foreach (var testSuite in testSuites[target])
+    foreach (var directory in testSuites[target])
     {
-        testSuite.Execute();
+        RunTestsInDirectory(directory);
     }
+}
+
+public void RunTestsInDirectory(string testDirectory)
+{
+    var xml = Path.GetFullPath(Path.Combine(testsDirectory, Path.GetFileName(testDirectory) + ".TestResults.xml"));
+    Cmd(testDirectory, "dotnet", $"xunit -configuration Release -nologo -nobuild -noautoreporters -notrait \"explicit=yes\" -xml {xml}");
 }
 
 public string GetVSLocation()
@@ -271,41 +273,4 @@ public string GetVSLocation()
     return installationPath;
 }
 
-abstract class TestSuite
-{
-    public abstract void Execute();
-}
-
-class DotnetTestSuite : TestSuite
-{
-    public DotnetTestSuite(string testDirectory)
-    {
-        this.TestDirectory = testDirectory;
-    }
-
-    public string TestDirectory { get; }
-
-    public override void Execute()
-    {
-        var xml = Path.GetFullPath(Path.Combine(testsDirectory, Path.GetFileName(this.TestDirectory) + ".TestResults.xml"));
-        Cmd(this.TestDirectory, "dotnet", $"xunit -configuration Release -nologo -nobuild -notrait \"explicit=yes\" -xml {xml}");
-    }
-}
-
-class ClassicTestSuite : TestSuite
-{
-    public ClassicTestSuite(string assemblyPath)
-    {
-        this.AssemblyPath = assemblyPath;
-    }
-
-    public string AssemblyPath { get; }
-
-    public override void Execute()
-    {
-        var baseFileName = Path.GetFullPath(Path.Combine(testsDirectory, Path.GetFileNameWithoutExtension(this.AssemblyPath))) + ".TestResults";
-        var xml = baseFileName + ".xml";
-        var html = baseFileName + ".html";
-        Cmd(xunit, $"{this.AssemblyPath} -noshadow -nologo -notrait \"explicit=yes\"' -xml {xml} -html {html}");
-    }
-}
+public static string GetCurrentScriptDirectory([CallerFilePath] string path = null) => Path.GetDirectoryName(path);
